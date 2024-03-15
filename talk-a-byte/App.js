@@ -4,6 +4,9 @@ import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Button, StyleSheet, Text, Image, SafeAreaView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { View } from "@gluestack-ui/themed";
+import LandingPage from "./screens/LandingScreen";
+import HomePage from "./screens/HomePage";
 
 export default function App() {
   // State to hold the selected image
@@ -78,26 +81,29 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.heading}>Talk a Byte</Text>
-      <Text style={styles.heading2}>Image to Text App</Text>
-      <Button title="Pick an image from gallery" onPress={pickImageGallery} />
-      <Button title="Pick an image from camera" onPress={pickImageCamera} />
-      {image && (
-        <Image
-          source={{ uri: image }}
-          style={{
-            width: 400,
-            height: 300,
-            objectFit: "contain",
-          }}
-        />
-      )}
+    // <SafeAreaView style={styles.container}>
+    //   <Text style={styles.heading}>Talk a Byte</Text>
+    //   <Text style={styles.heading2}>Image to Text App</Text>
+    //   <Button title="Pick an image from gallery" onPress={pickImageGallery} />
+    //   <Button title="Pick an image from camera" onPress={pickImageCamera} />
+    //   {image && (
+    //     <Image
+    //       source={{ uri: image }}
+    //       style={{
+    //         width: 400,
+    //         height: 300,
+    //         objectFit: "contain",
+    //       }}
+    //     />
+    //   )}
 
-      <Text style={styles.text1}>Extracted text:</Text>
-      <Text style={styles.text1}>{extractedText}</Text>
-      <StatusBar style="auto" />
-    </SafeAreaView>
+    //   <Text style={styles.text1}>Extracted text:</Text>
+    //   <Text style={styles.text1}>{extractedText}</Text>
+    //   <StatusBar style="auto" />
+    // </SafeAreaView>
+    <LandingPage />
+    // <HomePage />
+
   );
 }
 
