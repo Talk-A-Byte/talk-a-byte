@@ -1,25 +1,23 @@
-import { ObjectId } from "mongodb";
-import { User, loginInfo, payload } from "../types";
-import { GraphQLError } from "graphql";
-import { createToken } from "../utils/jwt";
-import { comparePassword } from "../utils/bcrypt";
-import {
+const { GraphQLError } = require("graphql");
+const { createToken } = require("../utils/jwt");
+const { comparePassword } = require("../utils/bcrypt");
+const {
   getUserCollection,
   getAllUsers,
   findOneById,
   addUser,
-} from "../model/user";
+} = require("../model/user");
 
-export const typeDefs = `#graphql
-     type User {
+const typeDefs = `#graphql
+    type User {
         _id: ID
-        name: String
+        name: String!
         email: String!
         password: String
     }
 
     input RegisterInput {
-        name: String
+        name: String!
         email: String!
         password: String
     }
@@ -39,16 +37,16 @@ export const typeDefs = `#graphql
     }
     `;
 
-export const resolvers = {
+const resolvers = {
   Query: {
     getUsers: async () => {
       const users = await getAllUsers();
 
       return users;
     },
-    userDetail: async (_parent: User, args: User) => {
-      const { id } = args;
-      const userFound = await findOneById(id);
+    userDetail: async (_parent, args) => {
+      const { userId } = args;
+      const userFound = await findOneById(userId);
       if (!userFound) {
         throw new GraphQLError("User not found", {
           extensions: {
@@ -62,15 +60,7 @@ export const resolvers = {
     },
   },
   Mutation: {
-    register: async (
-      _parent: User,
-      args: {
-        payload: {
-          email: string;
-          password: string;
-        };
-      }
-    ) => {
+    register: async (_parent, args) => {
       const { payload } = args;
       const { email, password } = payload;
 
@@ -126,7 +116,7 @@ export const resolvers = {
       return newUser;
     },
 
-    login: async (_parent: User, args: { email: string; password: string }) => {
+    login: async (_parent, args) => {
       const { email, password } = args;
       const user = await getUserCollection().findOne({ email });
       if (!user) {
@@ -149,7 +139,7 @@ export const resolvers = {
         });
       }
 
-      const payload: payload = {
+      const payload = {
         id: user._id,
         email: user.email,
       };

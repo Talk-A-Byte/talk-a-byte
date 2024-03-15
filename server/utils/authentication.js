@@ -1,8 +1,8 @@
-import { GraphQLError } from "graphql";
-import { verifyToken } from "./jwt";
-import { findOneById } from "../model/user";
+const { GraphQLError } = require("graphql");
+const { verifyToken } = require("./jwt");
+const { findOneById } = require("../model/user");
 
-export const jwtAuthentication = async (req) => {
+const authentication = async (req) => {
   const authorization = req.headers.authorization;
 
   if (!authorization) {
@@ -14,7 +14,7 @@ export const jwtAuthentication = async (req) => {
     });
   }
 
-  const token: string = authorization.split(" ")[1];
+  const token = authorization.split(" ")[1];
 
   if (!token) {
     throw new GraphQLError("Invalid Token", {
@@ -25,8 +25,7 @@ export const jwtAuthentication = async (req) => {
     });
   }
 
-  const decodedToken: { id: string; email: string; username: string } =
-    await verifyToken(token);
+  const decodedToken = verifyToken(token);
 
   const user = await findOneById(decodedToken.id);
 
@@ -41,7 +40,8 @@ export const jwtAuthentication = async (req) => {
 
   return {
     authorId: user._id,
-    username: user.username,
     userEmail: user.email,
   };
 };
+
+module.exports = authentication;

@@ -1,14 +1,14 @@
-import { ObjectId } from "mongodb";
-import { getDatabase } from "../config/mongoConnection";
-import { hashPassword } from "../utils/bcrypt";
+const { ObjectId } = require("mongodb");
+const { getDatabase } = require("../config/mongoConnection");
+const { hashPassword } = require("../utils/bcrypt");
 
-export const getUserCollection = () => {
+const getUserCollection = () => {
   const db = getDatabase();
   const userCollection = db.collection("users");
   return userCollection;
 };
 
-export const getAllUsers = async () => {
+const getAllUsers = async () => {
   const users = await getUserCollection()
     .find(
       {},
@@ -22,7 +22,7 @@ export const getAllUsers = async () => {
   return users;
 };
 
-export const findOneById = async (id: string) => {
+const findOneById = async (id) => {
   const user = await getUserCollection().findOne(
     {
       _id: new ObjectId(id),
@@ -37,7 +37,7 @@ export const findOneById = async (id: string) => {
   return user;
 };
 
-export const addUser = async (payload) => {
+const addUser = async (payload) => {
   payload.password = hashPassword(payload.password);
   const newUser = await getUserCollection().insertOne(payload);
 
@@ -52,4 +52,10 @@ export const addUser = async (payload) => {
     }
   );
   return user;
+};
+module.exports = {
+  getUserCollection,
+  getAllUsers,
+  findOneById,
+  addUser,
 };

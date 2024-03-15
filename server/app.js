@@ -1,12 +1,9 @@
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
-import { mongoConnect } from "./config/mongoConnection";
-import {
-  typeDefs as userTypeDefs,
-  resolvers as userResolvers,
-} from "./schemas/users";
-import { jwtAuthentication as authentication } from "./utils/authentication";
-const PORT: number | number = +process.env.PORT || 3000;
+const { ApolloServer } = require("@apollo/server");
+const { startStandaloneServer } = require("@apollo/server/standalone");
+const { mongoConnect } = require("./config/mongoConnection");
+const { userTypeDefs, userResolvers } = require("./schemas/users");
+const authentication = require("./utils/authentication");
+const PORT = process.env.PORT || 3000;
 
 const server = new ApolloServer({
   typeDefs: [userTypeDefs],
