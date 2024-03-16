@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   StyleSheet,
@@ -13,6 +13,7 @@ import * as Speech from "expo-speech";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import axios from "axios";
+import Voice from "@react-native-voice/voice";
 
 export default function App() {
   // State to hold the selected image
@@ -25,6 +26,38 @@ export default function App() {
 
   // Google Vision Object Recognization Labels
   const [labels, setLabels] = useState([]);
+  const [started, setStarted] = useState(false);
+  const [results, setResults] = useState("");
+
+  useEffect(() => {
+    Voice.onSpeechError = onSpeechError;
+    Voice.onSpeechResults = onSpeechResults;
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const startSpeechToText = async () => {
+    await Voice.start("en-NZ");
+    setStarted(true);
+  };
+
+  const stopSpeechToText = async () => {
+    await Voice.stop();
+    setStarted(false);
+  };
+
+  const onSpeechResults = (result) => {
+    setExtractedText(result.value[0]);
+    Speech.speak(result.value[0]);
+    setStarted(false);
+  };
+
+  const onSpeechError = (error) => {
+    setStarted(false);
+    console.log(error);
+  };
 
   // Function to pick an image from the
   // device's gallery
@@ -118,7 +151,12 @@ export default function App() {
           }}
         />
       )}
-
+      {!started ? (
+        <Button title="Start Speech to Text" onPress={startSpeechToText} />
+      ) : undefined}
+      {started ? (
+        <Button title="Stop Speech to Text" onPress={stopSpeechToText} />
+      ) : undefined}
       <Text style={styles.text1}>Extracted text:</Text>
       <ScrollView>
         <Text style={styles.text1}>{extractedText}</Text>
@@ -135,14 +173,23 @@ export default function App() {
         ) : (
           ""
         )}
+        <Button
+          title="Stop Speech"
+          onPress={() => {
+            Speech.stop();
+          }}
+        />
+        <Button
+          title="Text To Speech"
+          onPress={() => {
+            speak(extractedText);
+          }}
+        />
       </ScrollView>
-      <Button
-        title="Start listening"
-        onPress={() => {
-          speak(extractedText);
-        }}
-      />
 
+      <View>
+        <StatusBar style="auto" />
+      </View>
       <StatusBar style="auto" />
     </SafeAreaView>
   );
