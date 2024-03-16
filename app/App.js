@@ -16,6 +16,8 @@ import axios from "axios";
 
 export default function App() {
   // State to hold the selected image
+  const apiKey = process.env.EXPO_PUBLIC_API_KEY;
+  const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
   const [image, setImage] = useState(null);
 
   // State to hold extracted text
@@ -34,16 +36,11 @@ export default function App() {
       allowsMultipleSelection: false,
     });
     if (!result.canceled) {
-      // Perform OCR on the selected image
-      performOCR(result.assets[0]);
-
-      // Set the selected image in state
+      analyzeImage(result.assets[0].uri);
       setImage(result.assets[0].uri);
     }
   };
 
-  // Function to capture an image using the
-  // device's camera
   const pickImageCamera = async () => {
     try {
       let result = await ImagePicker.launchCameraAsync({
@@ -53,9 +50,7 @@ export default function App() {
         allowsMultipleSelection: false,
       });
       if (!result.canceled) {
-        // Perform OCR on the captured image
-        // Set the captured image in state
-        performOCR(result.assets[0]);
+        analyzeImage(result.assets[0].uri);
         setImage(result.assets[0].uri);
       }
     } catch (error) {
@@ -63,53 +58,15 @@ export default function App() {
     }
   };
 
-  // Function to perform OCR on an image
-  // and extract text
-  const performOCR = (file) => {
-    let myHeaders = new Headers();
-    myHeaders.append(
-      "apikey",
-
-      // ADDD YOUR API KEY HERE
-      "FEmvQr5uj99ZUvk3essuYb6P5lLLBS20"
-    );
-    myHeaders.append("Content-Type", "multipart/form-data");
-
-    let raw = file;
-    let requestOptions = {
-      method: "POST",
-      redirect: "follow",
-      headers: myHeaders,
-      body: raw,
-    };
-
-    // Send a POST request to the OCR API
-    fetch("https://api.apilayer.com/image_to_text/upload", requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        // Set the extracted text in state
-        setExtractedText(result["all_text"]);
-      })
-      .catch((error) => console.log("error", error));
-  };
-
-  const speak = (text) => {
-    Speech.speak(text);
-  };
-
-  const analyzeImage = async () => {
+  const analyzeImage = async (file) => {
     try {
-      if (!image) {
+      setLabels("");
+      setExtractedText("");
+      if (!file) {
         alert("Please select an image first.");
         return;
       }
-
-      // Replace 'YOUR_GOOGLE_CLOUD_VISION_API_KEY' with your actual API key
-      const apiKey = process.env.EXPO_PUBLIC_API_KEY;
-      const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
-
-      // Read the image file from local URI and convert it to base64
-      const base64ImageData = await FileSystem.readAsStringAsync(image, {
+      const base64ImageData = await FileSystem.readAsStringAsync(file, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
@@ -119,20 +76,32 @@ export default function App() {
             image: {
               content: base64ImageData,
             },
-            features: [{ type: "LABEL_DETECTION", maxResults: 5 }],
+            features: [
+              { type: "TEXT_DETECTION" },
+              { type: "LABEL_DETECTION", maxResults: 5 },
+            ],
           },
         ],
       };
 
       const apiResponse = await axios.post(apiUrl, requestData);
+      if (!apiResponse.data.responses[0].fullTextAnnotation.text) {
+        setExtractedText(`Cannot Extract Text from the images!`);
+        throw error;
+      }
+      setExtractedText(apiResponse.data.responses[0].fullTextAnnotation.text);
       setLabels(apiResponse.data.responses[0].labelAnnotations);
+      Speech.speak(apiResponse.data.responses[0].fullTextAnnotation.text);
     } catch (error) {
       console.error("Error analyzing image:", error);
       alert("Error analyzing image. Please try again later.");
     }
   };
 
-  console.log(labels);
+  const speak = (text) => {
+    Speech.speak(text);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.heading}>Talk a Byte</Text>
@@ -155,15 +124,13 @@ export default function App() {
         <Text style={styles.text1}>{extractedText}</Text>
         {labels && labels.length !== 0 ? (
           <>
-            <View>
-              {labels.map((label) => {
-                return (
-                  <View>
-                    <Text>{label.description}</Text>
-                  </View>
-                );
-              })}
-            </View>
+            {labels.map((label, idx) => {
+              return (
+                <View key={`${idx}-${label.scores}`}>
+                  <Text>{label.description}</Text>
+                </View>
+              );
+            })}
           </>
         ) : (
           ""
@@ -175,7 +142,6 @@ export default function App() {
           speak(extractedText);
         }}
       />
-      <Button title="Analyze Image" onPress={analyzeImage} />
 
       <StatusBar style="auto" />
     </SafeAreaView>
