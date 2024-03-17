@@ -118,13 +118,11 @@ export default function App() {
       };
 
       const apiResponse = await axios.post(apiUrl, requestData);
-      if (!apiResponse.data.responses[0].fullTextAnnotation.text) {
-        setExtractedText(`Cannot Extract Text from the images!`);
-        throw error;
+      if (apiResponse.data.responses[0].fullTextAnnotation?.text) {
+        setExtractedText(apiResponse.data.responses[0].fullTextAnnotation.text);
+        Speech.speak(apiResponse.data.responses[0].fullTextAnnotation.text);
       }
-      setExtractedText(apiResponse.data.responses[0].fullTextAnnotation.text);
       setLabels(apiResponse.data.responses[0].labelAnnotations);
-      Speech.speak(apiResponse.data.responses[0].fullTextAnnotation.text);
     } catch (error) {
       console.error("Error analyzing image:", error);
       alert("Error analyzing image. Please try again later.");
