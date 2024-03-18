@@ -1,9 +1,12 @@
 import React from "react";
-import { Text, StyleSheet, View, SafeAreaView, Pressable } from "react-native";
+import { Text, StyleSheet, View, SafeAreaView, Pressable, TouchableOpacity } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+
 
 export default function LandingPage() {
+    const navigation = useNavigation()
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient
@@ -12,18 +15,17 @@ export default function LandingPage() {
                 start={{ x: 2, y: 0 }}
                 end={{ x: 2, y: 1 }}
             >
-                <View style={styles.textContainer}>
-                    <Text style={styles.text}>Talk A Byte</Text>
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Pressable style={styles.button}>
-                        <Text style={styles.buttonText}>
-                            <Ionicons name="arrow-forward" size={25} color={"#008073"} />
-                        </Text>
-                    </Pressable>
-                </View>
+                <Text style={styles.text}>Talk A Byte</Text>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                        navigation.navigate("HomeStack", { screen: "HomeScreen" })
+                    }}
+                >
+                    <Ionicons name="arrow-forward" size={25} color={"#008073"} />
+                </TouchableOpacity>
             </LinearGradient>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }
 
@@ -36,31 +38,19 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    textContainer: {
-        flex: 1,
-        justifyContent: "flex-end",
-    },
     text: {
         color: "white",
         fontSize: 60,
         fontWeight: "bold",
         marginBottom: 20,
     },
-    buttonContainer: {
-        flex: 1,
-        justifyContent: "flex-end",
-        bottom: 80
-    },
     button: {
+        marginTop: 20,
         width: 150,
         height: 40,
         backgroundColor: "white",
         borderRadius: 26,
         justifyContent: "center",
         alignItems: "center",
-    },
-    buttonText: {
-        textAlign: "center",
-        padding: 5,
     },
 });

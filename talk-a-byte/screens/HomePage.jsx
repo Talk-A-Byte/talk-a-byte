@@ -1,12 +1,138 @@
-import React from "react";
-import { FlatList, StatusBar, StyleSheet, Dimensions, Image } from "react-native";
-import { SafeAreaView, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList, StyleSheet, Dimensions, Image, SafeAreaView, Text, View, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
+import * as Speech from "expo-speech";
+import * as FileSystem from "expo-file-system";
+import axios from "axios";
+import Voice from "@react-native-voice/voice";
+
 
 const windowWidth = Dimensions.get('window').width;
 
 export default function HomeScreen() {
     const data = [1, 2, 3];
+    const apiKey = process.env.EXPO_PUBLIC_API_KEY;
+    const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+    const navigation = useNavigation()
+
+
+    const [image, setImage] = useState(null);
+
+    // State to hold extracted text
+    const [extractedText, setExtractedText] = useState("");
+
+    // Google Vision Object Recognization Labels
+    const [labels, setLabels] = useState([]);
+    const [started, setStarted] = useState(false);
+    const [results, setResults] = useState("");
+
+    useEffect(() => {
+        Voice.onSpeechError = onSpeechError;
+        Voice.onSpeechResults = onSpeechResults;
+
+        return () => {
+            Voice.destroy().then(Voice.removeAllListeners);
+        };
+    }, []);
+
+    const startSpeechToText = async () => {
+        await Voice.start("en-NZ");
+        setStarted(true);
+    };
+
+    const stopSpeechToText = async () => {
+        await Voice.stop();
+        setStarted(false);
+    };
+
+    const onSpeechResults = (result) => {
+        setExtractedText(result.value[0]);
+        Speech.speak(result.value[0]);
+        setStarted(false);
+    };
+
+    const onSpeechError = (error) => {
+        setStarted(false);
+        console.log(error);
+    };
+
+    // Function to pick an image from the
+    // device's gallery
+    const pickImageGallery = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            base64: true,
+            allowsMultipleSelection: false,
+        });
+        if (!result.canceled) {
+            analyzeImage(result.assets[0].uri);
+            setImage(result.assets[0].uri);
+        }
+    };
+
+    const pickImageCamera = async () => {
+        try {
+            let result = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                base64: true,
+                allowsMultipleSelection: false,
+            });
+            if (!result.canceled) {
+                analyzeImage(result.assets[0].uri);
+                setImage(result.assets[0].uri);
+                navigation.navigate('ResultScreen', { image: image, extractedText: extractedText });
+            }
+        } catch (error) {
+            console.error("Error picking image:", error);
+        }
+    };
+
+    const analyzeImage = async (file) => {
+        try {
+            setLabels("");
+            setExtractedText("");
+            if (!file) {
+                alert("Please select an image first.");
+                return;
+            }
+            const base64ImageData = await FileSystem.readAsStringAsync(file, {
+                encoding: FileSystem.EncodingType.Base64,
+            });
+
+            const requestData = {
+                requests: [
+                    {
+                        image: {
+                            content: base64ImageData,
+                        },
+                        features: [
+                            { type: "TEXT_DETECTION" },
+                            { type: "LABEL_DETECTION", maxResults: 5 },
+                        ],
+                    },
+                ],
+            };
+
+            const apiResponse = await axios.post(apiUrl, requestData);
+            if (apiResponse.data.responses[0].fullTextAnnotation?.text) {
+                setExtractedText(apiResponse.data.responses[0].fullTextAnnotation.text);
+                Speech.speak(apiResponse.data.responses[0].fullTextAnnotation.text);
+            }
+            setLabels(apiResponse.data.responses[0].labelAnnotations);
+        } catch (error) {
+            console.error("Error analyzing image:", error);
+            alert("Error analyzing image. Please try again later.");
+        }
+    };
+
+    const speak = (text) => {
+        Speech.speak(text);
+    };
+
 
     const renderCard = ({ item }) => (
         <View style={styles.card}>
@@ -16,15 +142,23 @@ export default function HomeScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 25 }}>
                 <Ionicons name="hand-left-outline" size={30} color={"white"} />
-                <Ionicons name="exit-outline" size={30} color={"white"} />
+                <Pressable onPress={() => {
+                    console.log("log out");
+                }}>
+                    <Ionicons name="exit-outline" size={30} color={"white"} />
+                </Pressable>
             </View>
             <View>
                 <Text style={styles.text}>
                     Talk A Byte
                 </Text>
-                <Ionicons name="folder-open-outline" size={30} color={"#ffc800"} />
+                <Pressable onPress={() => {
+                    console.log("open Gallery");
+                }}>
+                    <Ionicons name="folder-open-outline" size={30} color={"#ffc800"} />
+                </Pressable>
             </View>
             <FlatList
                 horizontal
@@ -35,12 +169,18 @@ export default function HomeScreen() {
                 style={{ width: windowWidth }}
             />
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <View style={styles.cardButton}>
-                    <Ionicons name="camera-outline" size={100} color={"#008073"} />
-                </View>
-                <View style={styles.cardButton}>
-                    <Ionicons name="mic-outline" size={100} color={"#008073"} />
-                </View>
+                <Pressable onPress={pickImageCamera}>
+                    <View style={styles.cardButton}>
+                        <Ionicons name="camera-outline" size={100} color={"#008073"} />
+                    </View>
+                </Pressable>
+                <Pressable onPress={() => {
+                    console.log("to Recorder screen");
+                }}>
+                    <View style={styles.cardButton}>
+                        <Ionicons name="mic-outline" size={100} color={"#008073"} />
+                    </View>
+                </Pressable>
             </View>
         </SafeAreaView>
     );
@@ -76,8 +216,8 @@ const styles = StyleSheet.create({
         marginRight: 15
     },
     cardButton: {
-        width: 170,
-        height: 170,
+        width: 150,
+        height: 150,
         backgroundColor: "yellow",
         borderRadius: 24,
         marginVertical: 10,

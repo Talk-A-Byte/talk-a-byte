@@ -7,6 +7,11 @@ import * as ImagePicker from "expo-image-picker";
 import { View } from "@gluestack-ui/themed";
 import LandingPage from "./screens/LandingScreen";
 import HomePage from "./screens/HomePage";
+import MainStack from "./stacks/MainStack";
+import RecorderScreen from "./screens/RecorderScreen";
+import ResultScreen from "./screens/ResultScreen";
+import GalleryScreen from "./screens/GalleryScreen";
+import LoginScreen from "./screens/LoginScreen";
 
 export default function App() {
   // State to hold the selected image
@@ -101,7 +106,12 @@ export default function App() {
     //   <Text style={styles.text1}>{extractedText}</Text>
     //   <StatusBar style="auto" />
     // </SafeAreaView>
-    <LandingPage />
+    // <LandingPage />
+    <MainStack />
+    // <RecorderScreen />
+    // <ResultScreen />
+    // <GalleryScreen />
+    // <LoginScreen />
     // <HomePage />
 
   );
