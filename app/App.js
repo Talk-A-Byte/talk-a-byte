@@ -14,6 +14,11 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import axios from "axios";
 import Voice from "@react-native-voice/voice";
+import MainStack from "./stacks/MainStack";
+import LandingPage from "./screens/LandingScreen";
+import HomeScreen from "./screens/HomePage";
+import LoginScreen from "./screens/LoginScreen";
+import GalleryScreen from "./screens/GalleryScreen";
 
 export default function App() {
   // State to hold the selected image
@@ -27,7 +32,6 @@ export default function App() {
   // Google Vision Object Recognization Labels
   const [labels, setLabels] = useState([]);
   const [started, setStarted] = useState(false);
-  const [results, setResults] = useState("");
 
   useEffect(() => {
     Voice.onSpeechError = onSpeechError;
@@ -134,62 +138,64 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.heading}>Talk a Byte</Text>
-      <Text style={styles.heading2}>Image to Text App</Text>
-      <Button title="Pick an image from gallery" onPress={pickImageGallery} />
-      <Button title="Pick an image from camera" onPress={pickImageCamera} />
-      {image && (
-        <Image
-          source={{ uri: image }}
-          style={{
-            width: 400,
-            height: 300,
-            objectFit: "contain",
-          }}
-        />
-      )}
-      {!started ? (
-        <Button title="Start Speech to Text" onPress={startSpeechToText} />
-      ) : undefined}
-      {started ? (
-        <Button title="Stop Speech to Text" onPress={stopSpeechToText} />
-      ) : undefined}
-      <Text style={styles.text1}>Extracted text:</Text>
-      <ScrollView>
-        <Text style={styles.text1}>{extractedText}</Text>
-        {labels && labels.length !== 0 ? (
-          <>
-            {labels.map((label, idx) => {
-              return (
-                <View key={`${idx}-${label.scores}`}>
-                  <Text>{label.description}</Text>
-                </View>
-              );
-            })}
-          </>
-        ) : (
-          ""
-        )}
-        <Button
-          title="Stop Speech"
-          onPress={() => {
-            Speech.stop();
-          }}
-        />
-        <Button
-          title="Text To Speech"
-          onPress={() => {
-            speak(extractedText);
-          }}
-        />
-      </ScrollView>
+    // <SafeAreaView style={styles.container}>
+    //   <Text style={styles.heading}>Talk a Byte</Text>
+    //   <Text style={styles.heading2}>Image to Text App</Text>
+    //   <Button title="Pick an image from gallery" onPress={pickImageGallery} />
+    //   <Button title="Pick an image from camera" onPress={pickImageCamera} />
+    //   {image && (
+    //     <Image
+    //       source={{ uri: image }}
+    //       style={{
+    //         width: 400,
+    //         height: 300,
+    //         objectFit: "contain",
+    //       }}
+    //     />
+    //   )}
+    //   {!started ? (
+    //     <Button title="Start Speech to Text" onPress={startSpeechToText} />
+    //   ) : undefined}
+    //   {started ? (
+    //     <Button title="Stop Speech to Text" onPress={stopSpeechToText} />
+    //   ) : undefined}
+    //   <Text style={styles.text1}>Extracted text:</Text>
+    //   <ScrollView>
+    //     <Text style={styles.text1}>{extractedText}</Text>
+    //     {labels && labels.length !== 0 ? (
+    //       <>
+    //         {labels.map((label, idx) => {
+    //           return (
+    //             <View key={`${idx}-${label.scores}`}>
+    //               <Text>{label.description}</Text>
+    //             </View>
+    //           );
+    //         })}
+    //       </>
+    //     ) : (
+    //       ""
+    //     )}
+    //     <Button
+    //       title="Stop Speech"
+    //       onPress={() => {
+    //         Speech.stop();
+    //       }}
+    //     />
+    //     <Button
+    //       title="Text To Speech"
+    //       onPress={() => {
+    //         speak(extractedText);
+    //       }}
+    //     />
+    //   </ScrollView>
 
-      <View>
-        <StatusBar style="auto" />
-      </View>
-      <StatusBar style="auto" />
-    </SafeAreaView>
+    //   <View>
+    //     <StatusBar style="auto" />
+    //   </View>
+    //   <StatusBar style="auto" />
+    // </SafeAreaView>
+
+    <MainStack />
   );
 }
 
