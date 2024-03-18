@@ -3,11 +3,12 @@ const { startStandaloneServer } = require("@apollo/server/standalone");
 const { mongoConnect } = require("./config/mongoConnection");
 const { userTypeDefs, userResolvers } = require("./schemas/users");
 const authentication = require("./utils/authentication");
+const { scanTypeDefs, scanResolvers } = require("./schemas/scans");
 const PORT = process.env.PORT || 3000;
 
 const server = new ApolloServer({
-  typeDefs: [userTypeDefs],
-  resolvers: [userResolvers],
+  typeDefs: [userTypeDefs, scanTypeDefs],
+  resolvers: [userResolvers, scanResolvers],
   introspection: true,
 });
 
