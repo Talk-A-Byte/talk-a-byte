@@ -59,9 +59,10 @@ export default function RegisterScreen() {
         start={{ x: 2, y: 0 }}
         end={{ x: 2, y: 1 }}
       >
-        <Text style={styles.text}>Login</Text>
+        <Text style={styles.text}>Register</Text>
         <TextInput
           placeholder="Email"
+          keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
           style={{
@@ -89,6 +90,7 @@ export default function RegisterScreen() {
         <TextInput
           placeholder="Password"
           secureTextEntry={true}
+          keyboardType="numeric"
           value={password}
           onChangeText={setPassword}
           style={{
@@ -102,8 +104,21 @@ export default function RegisterScreen() {
         />
         <TouchableOpacity
           style={styles.button}
-          onPress={() => {
-            console.log("mau login");
+          onPress={async () => {
+            try {
+              await registDispatcher({
+                variables: {
+                  payload: {
+                    name,
+                    email,
+                    password,
+                  },
+                },
+              });
+              navigation.navigate("LoginScreen");
+            } catch (error) {
+              console.log(error);
+            }
           }}
         >
           <Text style={{ color: "#008073" }}>Register</Text>
@@ -119,7 +134,7 @@ export default function RegisterScreen() {
             padding: 5,
           }}
         >
-          <Text style={{ color: "white" }}>Don't have an account?</Text>
+          <Text style={{ color: "white" }}>Already have an account?</Text>
           <Pressable
             style={{
               width: 150,
@@ -131,10 +146,10 @@ export default function RegisterScreen() {
               alignItems: "center",
             }}
             onPress={() => {
-              navigation.navigate("RegisterScreen");
+              navigation.navigate("LoginScreen");
             }}
           >
-            <Text style={{ color: "white" }}>Register here</Text>
+            <Text style={{ color: "white" }}>Login here</Text>
           </Pressable>
         </View>
       </LinearGradient>
