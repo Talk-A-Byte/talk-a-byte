@@ -25,7 +25,7 @@ const typeDefs = `#graphql
         getScans: [Scans]
     }
     type Mutation {
-      addScan(fileName: String, file: String, UserId: ID): addScanRes
+      addScan(file:String): addScanRes
     }
 `;
 

@@ -7,7 +7,19 @@ const getScanCollection = () => {
   return scanCollection;
 };
 const getScans = async (UserId) => {
-  const scans = await getScanCollection().find({ UserId }).toArray();
+  const agg = [
+    {
+      $match: {
+        UserId,
+      },
+    },
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+  ];
+  const scans = await getScanCollection().aggregate(agg).toArray();
   return scans;
 };
 
@@ -16,6 +28,7 @@ const addScan = async (fileName, file, UserId) => {
     fileName,
     file,
     UserId,
+    createdAt: `${new Date()}`,
   });
   return newScan;
 };

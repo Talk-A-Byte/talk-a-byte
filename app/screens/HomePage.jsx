@@ -8,32 +8,33 @@ import {
   Text,
   View,
   Pressable,
-  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
-
 import * as Speech from "expo-speech";
 import * as FileSystem from "expo-file-system";
 import axios from "axios";
-
 import { useContext } from "react";
 import { LoginContext } from "../contexts/LoginContext";
+import * as SecureStore from "expo-secure-store";
+import { useQuery } from "@apollo/client";
+import { GET_SCANS } from "../queries";
 
 const windowWidth = Dimensions.get("window").width;
 
 export default function HomeScreen() {
-  const { isLoggedIn } = useContext(LoginContext);
+  const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
+
+  const { loading, data, error, refetch } = useQuery(GET_SCANS);
 
   let imgResult;
-  const data = [1, 2, 3];
   const apiKey = process.env.EXPO_PUBLIC_API_KEY;
   const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
   const navigation = useNavigation();
 
   const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false);
   // State to hold extracted text
   const [extractedText, setExtractedText] = useState("");
 
@@ -50,7 +51,7 @@ export default function HomeScreen() {
       allowsMultipleSelection: false,
     });
     if (!result.canceled) {
-      analyzeImage(result.assets[0].uri);
+      analyzeImage(result.assets[0].uri, false);
       setImage(result.assets[0].uri);
       imgResult = result.assets[0].uri;
     }
@@ -74,7 +75,7 @@ export default function HomeScreen() {
     }
   };
 
-  const analyzeImage = async (file) => {
+  const analyzeImage = async (file, baseOrNot) => {
     try {
       setLabels("");
       setExtractedText("");
@@ -82,9 +83,17 @@ export default function HomeScreen() {
         alert("Please select an image first.");
         return;
       }
-      const base64ImageData = await FileSystem.readAsStringAsync(file, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+      let base64ImageData = "";
+      if (baseOrNot) {
+        base64ImageData = file;
+        imgResult = file;
+      }
+      if (!baseOrNot) {
+        base64ImageData = await FileSystem.readAsStringAsync(file, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        imgResult = base64ImageData;
+      }
 
       const requestData = {
         requests: [
@@ -110,6 +119,7 @@ export default function HomeScreen() {
         image: imgResult,
         extractedText: apiResponse.data.responses[0].fullTextAnnotation.text,
         labels: apiResponse.data.responses[0].labelAnnotations,
+        file: base64ImageData,
       });
     } catch (error) {
       console.error("Error analyzing image:", error);
@@ -121,68 +131,149 @@ export default function HomeScreen() {
     Speech.speak(text);
   };
 
-  const renderCard = ({ item }) => (
-    <View style={styles.card}>
-      <Image
-        source={{
-          uri: "https://i.pinimg.com/564x/5f/7e/c2/5f7ec255d7927e360af2a6e767c3dd74.jpg",
+  const renderCard = ({ item }) => {
+    const { file } = item;
+
+    return (
+      <Pressable
+        onPress={() => {
+          analyzeImage(file, true);
         }}
-        style={{
-          flex: 1,
-          width: "100%",
-          height: "100%",
-          resizeMode: "cover",
-          borderRadius: 54,
-        }}
-      />
-    </View>
-  );
+      >
+        <Image
+          source={{ uri: `data:image/png;base64,${file}` }}
+          style={{
+            resizeMode: "contain",
+            borderRadius: 25,
+            flex: 1,
+            height: "100%",
+            width: 300,
+            backgroundColor: "black",
+          }}
+        />
+      </Pressable>
+    );
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        padding: 20,
+        paddingVertical: 50,
+        backgroundColor: "#008073",
+        gap: 20,
+      }}
+    >
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          marginTop: 25,
         }}
       >
-        <Ionicons name="hand-left-outline" size={30} color={"white"} />
+        <Ionicons name="hand-left-outline" size={30} color={"#FFC700"} />
+        {isLoggedIn && (
+          <Pressable
+            onPress={async () => {
+              await SecureStore.deleteItemAsync("token");
+              setIsLoggedIn(false);
+            }}
+          >
+            <Ionicons name="exit-outline" size={30} color={"#FFC700"} />
+          </Pressable>
+        )}
+      </View>
+      <View>
+        <Text
+          style={{
+            color: "white",
+            fontSize: 40,
+            fontWeight: "bold",
+          }}
+        >
+          Talk A Byte
+        </Text>
         {isLoggedIn && (
           <Pressable
             onPress={() => {
-              console.log("log out");
+              navigation.navigate("GalleryScreen");
             }}
+            style={{ flexDirection: "row", alignItems: "center" }}
           >
-            <Ionicons name="exit-outline" size={30} color={"white"} />
+            <Ionicons name="folder-open-outline" size={75} color={"#FFC700"} />
+            <Ionicons name="arrow-forward" size={30} color={"#FFC700"} />
           </Pressable>
         )}
-        {!isLoggedIn && (
+      </View>
+      {isLoggedIn && (
+        <>
+          {data?.getScans.length === 0 && (
+            <View
+              style={{
+                backgroundColor: "white",
+                borderRadius: 25,
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ color: "#008073", fontSize: 20 }}>
+                No saved images yet...
+              </Text>
+            </View>
+          )}
+          {data?.getScans.length != 0 && (
+            <FlatList
+              horizontal
+              data={data?.getScans}
+              renderItem={renderCard}
+              keyExtractor={(item, index) => index.toString()}
+              contentContainerStyle={{
+                flexGrow: 1,
+                flexDirection: "row",
+                gap: 10,
+              }}
+            />
+          )}
+        </>
+      )}
+
+      {!isLoggedIn && (
+        <View
+          style={{
+            backgroundColor: "white",
+            borderRadius: 25,
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Pressable
             onPress={() => {
               navigation.navigate("LoginScreen");
             }}
           >
-            <Ionicons name="enter-outline" size={30} color={"white"} />
+            <Ionicons name="enter-outline" size={100} color={"#008073"} />
           </Pressable>
-        )}
-      </View>
-      <View>
-        <Text style={styles.text}>Talk A Byte</Text>
-        <Pressable onPress={pickImageGallery}>
-          <Ionicons name="folder-open-outline" size={30} color={"#ffc800"} />
-        </Pressable>
-      </View>
-      <FlatList
-        horizontal
-        data={data}
-        renderItem={renderCard}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ flexGrow: 1, flexDirection: "row" }}
-        style={{ width: windowWidth }}
-      />
+        </View>
+      )}
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Pressable onPress={pickImageCamera}>
+        <Pressable
+          onPress={() =>
+            Alert.alert("Hi!", "Which one would u prefer?", [
+              {
+                text: "Pick image from gallery",
+                onPress: pickImageGallery,
+              },
+              {
+                text: "Pick image from Camera",
+                onPress: pickImageCamera,
+              },
+            ])
+          }
+        >
           <View style={styles.cardButton}>
             <Ionicons name="camera-outline" size={100} color={"#008073"} />
           </View>
@@ -205,6 +296,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingVertical: 50,
     backgroundColor: "#008073",
   },
   content: {
@@ -224,18 +316,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   card: {
-    width: 300,
-    height: 359,
+    flex: 1,
     borderRadius: 54,
-    marginVertical: 10,
-    marginRight: 15,
   },
   cardButton: {
     width: 150,
     height: 150,
-    backgroundColor: "yellow",
+    backgroundColor: "#FFC700",
     borderRadius: 24,
-    marginVertical: 10,
     justifyContent: "center",
     alignItems: "center",
   },

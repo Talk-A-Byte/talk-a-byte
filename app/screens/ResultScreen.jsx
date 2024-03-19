@@ -10,10 +10,16 @@ import {
   Button,
 } from "react-native";
 import * as Speech from "expo-speech";
+import { useMutation } from "@apollo/client";
+import { ADD_SCAN, GET_SCANS } from "../queries";
 
 export default function ResultScreen({ route, navigation }) {
-  const { image, extractedText, labels } = route.params;
+  const { image, extractedText, labels, file } = route.params;
   const [imageLoaded, setImageLoaded] = useState("");
+
+  const [addScan, { error, loading, data }] = useMutation(ADD_SCAN, {
+    refetchQueries: [GET_SCANS],
+  });
 
   useEffect(() => {
     if (image) {
@@ -22,7 +28,14 @@ export default function ResultScreen({ route, navigation }) {
     Speech.speak(extractedText);
   }, [image]);
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        flex: 1,
+        padding: 25,
+        backgroundColor: "#008073",
+        gap: 20,
+      }}
+    >
       <View
         style={{
           flexDirection: "row",
@@ -33,7 +46,6 @@ export default function ResultScreen({ route, navigation }) {
         <Pressable
           onPress={() => {
             Speech.stop();
-
             navigation.goBack();
           }}
         >
@@ -42,57 +54,86 @@ export default function ResultScreen({ route, navigation }) {
       </View>
       {imageLoaded && (
         <Image
-          source={{ uri: image }}
+          source={{ uri: `data:image/png;base64,${image}` }}
           style={{
-            width: 310,
-            height: 300,
+            resizeMode: "contain",
+            backgroundColor: "black",
+            width: "100%",
+            height: "35%",
             borderRadius: 24,
-            marginVertical: 20,
           }}
         />
       )}
-      <ScrollView>
-        <View style={styles.textBoard}>
-          <Pressable
-            style={{
-              alignItems: "flex-end",
-              marginHorizontal: 20,
-              marginVertical: 20,
-            }}
-            onPress={() => {
-              console.log("copy that");
-            }}
-          >
-            <Ionicons name="copy-outline" size={45} color={"#008073"} />
-          </Pressable>
-          <Text style={{ color: "black" }}>{extractedText}</Text>
-          {labels && labels.length !== 0 ? (
-            <>
-              {labels.map((label, idx) => {
-                return (
-                  <View key={`${idx}-${label.scores}`}>
-                    <Text>{label.description}</Text>
-                  </View>
-                );
-              })}
-            </>
-          ) : (
-            ""
-          )}
-        </View>
-        <Button
-          title="Text To Speech"
-          onPress={() => {
-            Speech.speak(extractedText);
+      <ScrollView
+        style={{
+          width: "100%",
+          backgroundColor: "white",
+          borderRadius: 24,
+          padding: 20,
+        }}
+      >
+        <Pressable
+          style={{
+            alignItems: "flex-end",
+            marginHorizontal: 20,
+            marginVertical: 20,
           }}
-        />
-        <Button
-          title="Stop Speech to Text"
-          onPress={() => {
-            Speech.stop();
+          onPress={async () => {
+            try {
+              await addScan({
+                variables: {
+                  file: image,
+                },
+              });
+              Speech.stop();
+
+              navigation.navigate("HomeScreen");
+            } catch (error) {
+              console.log(error);
+            }
           }}
-        />
+        >
+          <Ionicons name="save" size={45} color={"#008073"} />
+        </Pressable>
+        <Text style={{ color: "#FFC700", fontSize: 30, fontWeight: "bold" }}>
+          Extracted Text:
+        </Text>
+        <Text style={{ color: "black", fontSize: 30, fontWeight: "bold" }}>
+          {extractedText}
+        </Text>
+        <Text style={{ color: "#008073", fontSize: 30, fontWeight: "bold" }}>
+          Object Recognized:
+        </Text>
+
+        {labels && labels.length !== 0 ? (
+          <>
+            {labels.map((label, idx) => {
+              return (
+                <Text
+                  style={{ color: "black", fontSize: 30, fontWeight: "bold" }}
+                  key={`${idx}-${label.scores}`}
+                >
+                  -{label.description}
+                </Text>
+              );
+            })}
+          </>
+        ) : (
+          ""
+        )}
       </ScrollView>
+      <Button
+        title="Text To Speech"
+        onPress={() => {
+          Speech.speak(extractedText);
+        }}
+      />
+      <Button
+        title="Stop Speech to Text"
+        onPress={() => {
+          Speech.stop();
+        }}
+      />
     </View>
   );
 }

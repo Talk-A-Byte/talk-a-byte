@@ -1,2 +1,3 @@
 MONGODB_URI=mongodb+srv://whisnu29:mongodb%40123@cluster0.xauzqoa.mongodb.net/
 secretKey=rahasia
+DB_NAME=talk_a_byte
