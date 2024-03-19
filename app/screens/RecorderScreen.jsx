@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet, Pressable, Text, Button } from "react-native";
+import { View, StyleSheet, Pressable, Text, Button, TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import Voice from "@react-native-voice/voice";
 import * as Speech from "expo-speech";
@@ -7,6 +7,7 @@ import * as Speech from "expo-speech";
 export default function RecorderScreen() {
   const [started, setStarted] = useState(false);
   const [extractedText, setExtractedText] = useState("");
+  const [onSpeak, setOnSpeak] = useState(false)
 
   useEffect(() => {
     Voice.onSpeechError = onSpeechError;
@@ -16,6 +17,12 @@ export default function RecorderScreen() {
       Voice.destroy().then(Voice.removeAllListeners);
     };
   }, []);
+
+  const handleInputChange = (input) => {
+    setExtractedText(input);
+    setStarted(false);
+  }
+
 
   const startSpeechToText = async () => {
     await Voice.start("en-NZ");
@@ -28,6 +35,11 @@ export default function RecorderScreen() {
   };
 
   const onSpeechResults = (result) => {
+    if (!result) {
+      Speech.speak(extractedText);
+      setStarted(false);
+
+    }
     setExtractedText(result.value[0]);
     Speech.speak(result.value[0]);
     setStarted(false);
@@ -53,40 +65,51 @@ export default function RecorderScreen() {
           <Pressable
             style={{
               alignItems: "flex-end",
-              marginHorizontal: 20,
-              marginVertical: 20,
             }}
             onPress={() => {
               console.log("copy that");
             }}
           >
-            <Ionicons name="copy-outline" size={45} color={"#008073"} />
+            <Ionicons name="copy" size={45} color={"#008073"} />
           </Pressable>
-          <Text>{extractedText}</Text>
+          <TextInput onChangeText={handleInputChange} value={extractedText} style={{ fontSize: 24, fontWeight: "bold", flex: 1 }} multiline={true} />
+
         </View>
-        {!started ? (
-          <Pressable onPress={startSpeechToText}>
-            <View style={styles.cardButton}>
-              <Ionicons name="mic-outline" size={100} color={"#008073"} />
-            </View>
-          </Pressable>
-        ) : undefined}
-        {started ? (
-          <Pressable onPress={stopSpeechToText}>
-            <View style={styles.cardButton}>
-              <Ionicons name="mic-outline" size={100} color={"red"} />
-            </View>
-          </Pressable>
-        ) : undefined}
-        <Pressable
-          onPress={() => {
-            Speech.speak(extractedText);
-          }}
-        >
-          <View style={styles.cardButton}>
-            <Ionicons name="mic-outline" size={100} color={"#008073"} />
-          </View>
-        </Pressable>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          {!started ? (
+            <Pressable onPress={startSpeechToText}>
+              <View style={styles.cardButton}>
+                <Ionicons name="mic" size={100} color={"#008073"} />
+              </View>
+            </Pressable>
+          ) : undefined}
+          {started ? (
+            <Pressable onPress={stopSpeechToText}>
+              <View style={styles.cardButton}>
+                <Ionicons name="pause" size={100} color={"#008073"} />
+              </View>
+            </Pressable>
+          ) : undefined}
+          {onSpeak ? (<Pressable
+            onPress={() => {
+              Speech.stop();
+              setOnSpeak(false)
+            }}
+            style={styles.cardButton}
+          >
+            <Ionicons name="volume-mute" size={100} color={"#008073"} />
+
+          </Pressable>) : (<Pressable
+            onPress={() => {
+              Speech.speak(extractedText);
+              setOnSpeak(true)
+            }}
+            style={styles.cardButton}
+          >
+            <Ionicons name="volume-medium" size={100} color={"#008073"} />
+          </Pressable>)
+          }
+        </View>
       </View>
     </View>
   );
@@ -136,5 +159,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     marginVertical: 40,
     borderRadius: 24,
+    padding: 20
   },
 });

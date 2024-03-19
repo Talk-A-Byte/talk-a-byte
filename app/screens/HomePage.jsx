@@ -9,6 +9,7 @@ import {
   View,
   Pressable,
   ActivityIndicator,
+  Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -39,7 +40,7 @@ export default function HomeScreen() {
   const pickImageGallery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: false,
       base64: true,
       allowsMultipleSelection: false,
     });
@@ -54,7 +55,7 @@ export default function HomeScreen() {
     try {
       let result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: false,
         base64: true,
         allowsMultipleSelection: false,
       });
@@ -152,7 +153,9 @@ export default function HomeScreen() {
       </View>
       <View>
         <Text style={styles.text}>Talk A Byte</Text>
-        <Pressable onPress={pickImageGallery}>
+        <Pressable onPress={() => {
+          navigation.navigate("GalleryScreen")
+        }}>
           <Ionicons name="folder-open-outline" size={30} color={"#ffc800"} />
         </Pressable>
       </View>
@@ -165,7 +168,15 @@ export default function HomeScreen() {
         style={{ width: windowWidth }}
       />
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Pressable onPress={pickImageCamera}>
+        <Pressable onPress={() => Alert.alert("Hi!", "Which one would u prefer?", [
+          {
+            text: "Pick image from gallery",
+            onPress: pickImageGallery
+          }, {
+            text: "Pick image from Camera",
+            onPress: pickImageCamera
+          }
+        ])}>
           <View style={styles.cardButton}>
             <Ionicons name="camera-outline" size={100} color={"#008073"} />
           </View>

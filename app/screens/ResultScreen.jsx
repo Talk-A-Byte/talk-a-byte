@@ -14,6 +14,7 @@ import * as Speech from "expo-speech";
 export default function ResultScreen({ route }) {
   const { image, extractedText, labels } = route.params;
   const [imageLoaded, setImageLoaded] = useState("");
+  const [onSpeak, setOnSpeak] = useState(false)
 
   useEffect(() => {
     if (image) {
@@ -21,6 +22,11 @@ export default function ResultScreen({ route }) {
     }
     Speech.speak(extractedText);
   }, [image]);
+
+
+
+
+
   return (
     <View style={styles.container}>
       <View
@@ -70,13 +76,14 @@ export default function ResultScreen({ route }) {
           >
             <Ionicons name="copy-outline" size={45} color={"#008073"} />
           </Pressable>
-          <Text style={{ color: "black" }}>{extractedText}</Text>
+          <Text style={{ color: "black", fontSize: 24, fontWeight: "bold" }}>{extractedText}</Text>
           {labels && labels.length !== 0 ? (
             <>
+              <Text style={{ paddingTop: 10, fontSize: 16 }}>Description Label</Text>
               {labels.map((label, idx) => {
                 return (
-                  <View key={`${idx}-${label.scores}`}>
-                    <Text>{label.description}</Text>
+                  <View key={`${idx}-${label.scores}`}  >
+                    <Text style={{ fontSize: 16 }}>- {label.description}</Text>
                   </View>
                 );
               })}
@@ -85,18 +92,28 @@ export default function ResultScreen({ route }) {
             ""
           )}
         </View>
-        <Button
-          title="Text To Speech"
-          onPress={() => {
-            Speech.speak(extractedText);
-          }}
-        />
-        <Button
-          title="Stop Speech to Text"
-          onPress={() => {
-            Speech.stop();
-          }}
-        />
+
+        <View style={{ padding: 20, alignItems: "center" }}>
+          {onSpeak ? (<Pressable
+            onPress={() => {
+              Speech.stop();
+            }}
+            style={styles.cardButton}
+          >
+            <Ionicons name="volume-mute" size={100} color={"#008073"} />
+
+          </Pressable>) : (<Pressable
+            onPress={() => {
+              Speech.speak(extractedText);
+              setOnSpeak(true)
+            }}
+            style={styles.cardButton}
+          >
+            <Ionicons name="play" size={100} color={"#008073"} />
+
+          </Pressable>)
+          }
+        </View>
       </ScrollView>
     </View>
   );
@@ -129,6 +146,6 @@ const styles = StyleSheet.create({
     width: 310,
     backgroundColor: "white",
     borderRadius: 24,
-    padding: 10,
+    padding: 20,
   },
 });

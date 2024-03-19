@@ -104,16 +104,7 @@ export default function GalleryScreen() {
             <View style={{ flexDirection: "row", marginVertical: 5 }}>
               <Image
                 source={{ uri: `${item.image}` }}
-                style={{ width: 150, height: 150, borderRadius: 16 }}
-              />
-              <Image
-                source={{ uri: `${item.image}` }}
-                style={{
-                  width: 150,
-                  height: 150,
-                  marginHorizontal: 10,
-                  borderRadius: 16,
-                }}
+                style={{ width: 300, height: 300, borderRadius: 16 }}
               />
             </View>
           )}
