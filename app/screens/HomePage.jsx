@@ -13,13 +13,19 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
+
 import * as Speech from "expo-speech";
 import * as FileSystem from "expo-file-system";
 import axios from "axios";
 
+import { useContext } from "react";
+import { LoginContext } from "../contexts/LoginContext";
+
 const windowWidth = Dimensions.get("window").width;
 
 export default function HomeScreen() {
+  const { isLoggedIn } = useContext(LoginContext);
+
   let imgResult;
   const data = [1, 2, 3];
   const apiKey = process.env.EXPO_PUBLIC_API_KEY;
@@ -142,13 +148,24 @@ export default function HomeScreen() {
         }}
       >
         <Ionicons name="hand-left-outline" size={30} color={"white"} />
-        <Pressable
-          onPress={() => {
-            console.log("log out");
-          }}
-        >
-          <Ionicons name="exit-outline" size={30} color={"white"} />
-        </Pressable>
+        {isLoggedIn && (
+          <Pressable
+            onPress={() => {
+              console.log("log out");
+            }}
+          >
+            <Ionicons name="exit-outline" size={30} color={"white"} />
+          </Pressable>
+        )}
+        {!isLoggedIn && (
+          <Pressable
+            onPress={() => {
+              navigation.navigate("LoginScreen");
+            }}
+          >
+            <Ionicons name="enter-outline" size={30} color={"white"} />
+          </Pressable>
+        )}
       </View>
       <View>
         <Text style={styles.text}>Talk A Byte</Text>

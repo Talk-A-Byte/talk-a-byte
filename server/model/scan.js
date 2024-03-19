@@ -11,11 +11,16 @@ const getScans = async (UserId) => {
   return scans;
 };
 
-const addScan = async (file, UserId) => {
-  const newScan = await getScanCollection().insertOne();
+const addScan = async (fileName, file, UserId) => {
+  const newScan = await getScanCollection().insertOne({
+    fileName,
+    file,
+    UserId,
+  });
   return newScan;
 };
 
 module.exports = {
+  addScan,
   getScans,
 };

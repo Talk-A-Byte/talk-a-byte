@@ -7,7 +7,7 @@ const {
   findOneById,
   addUser,
 } = require("../model/user");
-const { getScans } = require("../model/scan");
+const { getScans, addScan } = require("../model/scan");
 
 const typeDefs = `#graphql
     type Scans{
@@ -17,8 +17,15 @@ const typeDefs = `#graphql
         UserId:String
         createdAt:String
     }
+    type addScanRes {
+      acknowledged: Boolean
+      insertedId: ID
+    }
     type Query {
         getScans: [Scans]
+    }
+    type Mutation {
+      addScan(fileName: String, file: String, UserId: ID): addScanRes
     }
 `;
 
@@ -28,6 +35,17 @@ const resolvers = {
       const userLogin = await contextValue.auth();
       const scans = await getScans(userLogin.authorId);
       return scans;
+    },
+  },
+  Mutation: {
+    addScan: async (_parent, args, contextValue) => {
+      const userLogin = await contextValue.auth();
+      const newScan = await addScan(
+        args.fileName,
+        args.file,
+        userLogin.authorId
+      );
+      return newScan;
     },
   },
 };

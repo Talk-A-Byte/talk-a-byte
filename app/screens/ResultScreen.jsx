@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import * as Speech from "expo-speech";
 
-export default function ResultScreen({ route }) {
+export default function ResultScreen({ route, navigation }) {
   const { image, extractedText, labels } = route.params;
   const [imageLoaded, setImageLoaded] = useState("");
 
@@ -32,17 +32,12 @@ export default function ResultScreen({ route }) {
       >
         <Pressable
           onPress={() => {
-            console.log("back");
+            Speech.stop();
+
+            navigation.goBack();
           }}
         >
           <Ionicons name="arrow-back" size={30} color={"white"} />
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            console.log("exit");
-          }}
-        >
-          <Ionicons name="exit-outline" size={30} color={"white"} />
         </Pressable>
       </View>
       {imageLoaded && (

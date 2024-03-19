@@ -13,7 +13,10 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +24,8 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": ["android.permission.RECORD_AUDIO"],
-      "package": "com.whisnuwardhana.app"
+      "package": "com.whisnuwardhana.app",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -39,12 +43,16 @@
           "microphonePermission": "Allow Voice to Text Tutorial to access the microphone",
           "speechRecognitionPermission": "Allow Voice to Text Tutorial to securely recognize user speech"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "extra": {
       "eas": {
         "projectId": "5061d589-00f1-4236-8f58-493fe490f7f6"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5061d589-00f1-4236-8f58-493fe490f7f6"
     }
   }
 }

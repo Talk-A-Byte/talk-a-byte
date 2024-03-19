@@ -12,7 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
   const navigation = useNavigation();
 
   const [username, setUsername] = useState("");
@@ -35,6 +35,7 @@ export default function LoginScreen() {
           style={{
             backgroundColor: "white",
             height: 48,
+            marginBottom: 8,
             padding: 10,
             width: 300,
             fontSize: 24,
@@ -43,13 +44,13 @@ export default function LoginScreen() {
         />
         <TextInput
           placeholder="Password"
-          keyboardType="numeric"
           secureTextEntry={true}
           value={password}
           onChangeText={setPassword}
           style={{
             backgroundColor: "white",
             height: 48,
+            marginBottom: 8,
             padding: 10,
             width: 300,
             fontSize: 24,
@@ -59,7 +60,7 @@ export default function LoginScreen() {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            console.log(password, username);
+            console.log("mau login");
           }}
         >
           <Text style={{ color: "#008073" }}>Login</Text>
@@ -67,30 +68,18 @@ export default function LoginScreen() {
         <View
           style={{
             flexDirection: "column",
-            gap: 10,
+            gap: 2,
             alignItems: "center",
-            width: "50%",
-            borderTopColor: "white",
-            borderTopWidth: 2,
-            padding: 5,
           }}
         >
           <Text style={{ color: "white" }}>Don't have an account?</Text>
           <Pressable
-            style={{
-              width: 150,
-              height: 40,
-              borderColor: "white",
-              borderWidth: 2,
-              borderRadius: 26,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+            style={styles.button}
             onPress={() => {
               navigation.navigate("RegisterScreen");
             }}
           >
-            <Text style={{ color: "white" }}>Register here</Text>
+            <Text style={{ color: "#008073" }}>Register here</Text>
           </Pressable>
         </View>
       </LinearGradient>
@@ -101,20 +90,20 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "red",
   },
   content: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 10,
   },
   text: {
     color: "white",
     fontSize: 60,
     fontWeight: "bold",
+    marginBottom: 20,
   },
   button: {
+    marginTop: 20, // Perubahan dari marginBottom ke marginTop
     width: 150,
     height: 40,
     backgroundColor: "white",

@@ -3,6 +3,7 @@ import HomeScreen from "../screens/HomePage";
 import GalleryScreen from "../screens/GalleryScreen";
 import RecorderScreen from "../screens/RecorderScreen";
 import ResultScreen from "../screens/ResultScreen";
+import LoginScreen from "../screens/LoginScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,16 @@ export default function HomeStack() {
         name="ResultScreen"
         component={ResultScreen}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "",
+          headerTintColor: "white",
+        }}
       />
     </Stack.Navigator>
   );
