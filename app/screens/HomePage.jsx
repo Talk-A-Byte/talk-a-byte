@@ -117,7 +117,9 @@ export default function HomeScreen() {
       setLabels(apiResponse.data.responses[0].labelAnnotations);
       navigation.navigate("ResultScreen", {
         image: imgResult,
-        extractedText: apiResponse.data.responses[0].fullTextAnnotation.text,
+        extractedText: apiResponse.data.responses[0].fullTextAnnotation
+          ? apiResponse.data.responses[0].fullTextAnnotation.text
+          : "",
         labels: apiResponse.data.responses[0].labelAnnotations,
         file: base64ImageData,
       });
@@ -125,10 +127,6 @@ export default function HomeScreen() {
       console.error("Error analyzing image:", error);
       alert("Error analyzing image. Please try again later.");
     }
-  };
-
-  const speak = (text) => {
-    Speech.speak(text);
   };
 
   const renderCard = ({ item }) => {
