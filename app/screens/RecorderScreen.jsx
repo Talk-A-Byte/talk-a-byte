@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet, Pressable, TextInput } from "react-native";
+import { View, StyleSheet, Pressable, TextInput, Text } from "react-native";
 import { useState, useEffect } from "react";
 import Voice from "@react-native-voice/voice";
 import * as Speech from "expo-speech";
@@ -68,17 +68,32 @@ export default function RecorderScreen() {
       </Pressable>
       <View style={{ alignItems: "center" }}>
         <View style={styles.textBoard}>
-          <Pressable></Pressable>
-          <Pressable
-            style={{
-              alignItems: "flex-end",
-            }}
-            onPress={() => {
-              console.log("copy that");
-            }}
+          <View
+            style={{ flexDirection: "row", alignSelf: "flex-end", gap: 10 }}
           >
-            <Ionicons name="copy" size={45} color={"#008073"} />
-          </Pressable>
+            <Pressable
+              onPress={() => {
+                if (font === "lucida grande") setFont("OpenDyslexic3-Regular");
+                if (font === "OpenDyslexic3-Regular") setFont("lucida grande");
+              }}
+            >
+              <Text
+                style={{ fontSize: 40, color: "#008073", fontFamily: font }}
+              >
+                Aa
+              </Text>
+            </Pressable>
+            <Pressable
+              style={{
+                alignItems: "flex-end",
+              }}
+              onPress={() => {
+                console.log("copy that");
+              }}
+            >
+              <Ionicons name="copy" size={45} color={"#008073"} />
+            </Pressable>
+          </View>
           <TextInput
             onChangeText={handleInputChange}
             value={extractedText}
@@ -178,5 +193,6 @@ const styles = StyleSheet.create({
     marginVertical: 40,
     borderRadius: 24,
     padding: 20,
+    flexDirection: "column",
   },
 });
