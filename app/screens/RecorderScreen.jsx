@@ -1,23 +1,21 @@
 import { Ionicons } from "@expo/vector-icons";
-import {
-  View,
-  StyleSheet,
-  Pressable,
-  Text,
-  Button,
-  TextInput,
-} from "react-native";
+import { View, StyleSheet, Pressable, TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import Voice from "@react-native-voice/voice";
 import * as Speech from "expo-speech";
 import { useNavigation } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 
 export default function RecorderScreen() {
+  const [fontsLoaded] = useFonts({
+    "OpenDyslexic3-Regular": require("../fonts/OpenDyslexic3-Regular.ttf"),
+  });
   const navigation = useNavigation();
 
   const [started, setStarted] = useState(false);
   const [extractedText, setExtractedText] = useState("");
   const [onSpeak, setOnSpeak] = useState(false);
+  const [font, setFont] = useState("lucida grande");
 
   useEffect(() => {
     Voice.onSpeechError = onSpeechError;
@@ -70,6 +68,7 @@ export default function RecorderScreen() {
       </Pressable>
       <View style={{ alignItems: "center" }}>
         <View style={styles.textBoard}>
+          <Pressable></Pressable>
           <Pressable
             style={{
               alignItems: "flex-end",
@@ -83,7 +82,12 @@ export default function RecorderScreen() {
           <TextInput
             onChangeText={handleInputChange}
             value={extractedText}
-            style={{ fontSize: 24, fontWeight: "bold", flex: 1 }}
+            style={{
+              fontSize: 24,
+              fontWeight: "regular",
+              flex: 1,
+              fontFamily: font,
+            }}
             multiline={true}
           />
         </View>

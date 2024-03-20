@@ -44,7 +44,16 @@
           "speechRecognitionPermission": "Allow Voice to Text Tutorial to securely recognize user speech"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./fonts/OpenDyslexic3-Bold.ttf",
+            "./fonts/OpenDyslexic3-Regular.ttf"
+          ]
+        }
+      ]
     ],
     "extra": {
       "eas": {

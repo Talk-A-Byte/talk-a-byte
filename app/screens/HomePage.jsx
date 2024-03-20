@@ -171,7 +171,7 @@ export default function HomeScreen() {
           justifyContent: "space-between",
         }}
       >
-        <Ionicons name="hand-left-outline" size={30} color={"#FFC700"} />
+        <Ionicons name="hand-left" size={30} color={"#FFC700"} />
         {isLoggedIn && (
           <Pressable
             onPress={async () => {
