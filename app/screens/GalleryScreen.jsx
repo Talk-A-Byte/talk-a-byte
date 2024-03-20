@@ -157,7 +157,13 @@ export default function GalleryScreen() {
           renderItem={({ item }) => {
             const { file } = item;
             return (
-              <View style={{ flexDirection: "row", marginVertical: 5 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginVertical: 5,
+                  justifyContent: "center",
+                }}
+              >
                 <Pressable
                   onPress={() => {
                     analyzeImage(file, true);
@@ -166,8 +172,8 @@ export default function GalleryScreen() {
                   <Image
                     source={{ uri: `data:image/png;base64,${item.file}` }}
                     style={{
-                      width: 350,
-                      height: 350,
+                      width: 300,
+                      height: 300,
                       borderRadius: 16,
                       resizeMode: "contain",
                       backgroundColor: "black",

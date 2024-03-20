@@ -161,15 +161,15 @@ const styles = StyleSheet.create({
   cardButton: {
     width: 150,
     height: 150,
-    backgroundColor: "yellow",
+    backgroundColor: "#FFC700",
     borderRadius: 24,
     marginVertical: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   textBoard: {
-    width: 320,
-    height: 350,
+    width: "100%",
+    height: "65%",
     backgroundColor: "white",
     marginVertical: 40,
     borderRadius: 24,
