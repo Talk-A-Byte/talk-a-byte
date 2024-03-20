@@ -1,10 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet, Pressable, TextInput } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  TextInput,
+  Text,
+  ToastAndroid,
+  AlertIOS,
+  Platform,
+} from "react-native";
 import { useState, useEffect } from "react";
 import Voice from "@react-native-voice/voice";
 import * as Speech from "expo-speech";
 import { useNavigation } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import * as Clipboard from "expo-clipboard";
 
 export default function RecorderScreen() {
   const [fontsLoaded] = useFonts({
@@ -28,23 +38,15 @@ export default function RecorderScreen() {
     };
   }, []);
 
-  const handleCopyText = (text) => {
-    setCopyText(text);
-    setCopied(false);
-  };
+  const copyToClipboard = async (text) => {
+    if (text) {
+      await Clipboard.setStringAsync(text);
 
-  const copyToClipboard = () => {
-    if (copyText) {
-      Clipboard.setString(copyText);
-
-      // Display a success message
       if (Platform.OS === "android") {
         ToastAndroid.show("Text copied to clipboard!", ToastAndroid.SHORT);
       } else if (Platform.OS === "ios") {
         AlertIOS.alert("Text copied to clipboard!");
       }
-
-      setCopied(true);
     }
   };
 
@@ -110,7 +112,7 @@ export default function RecorderScreen() {
                 alignItems: "flex-end",
               }}
               onPress={() => {
-                console.log("copy that");
+                copyToClipboard(extractedText);
               }}
             >
               <Ionicons name="copy" size={45} color={"#008073"} />

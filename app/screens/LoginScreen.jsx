@@ -44,12 +44,7 @@ export default function LoginScreen() {
   }
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={["#ffc800", "#4bcc99", "#008073"]}
-        style={styles.content}
-        start={{ x: 2, y: 0 }}
-        end={{ x: 2, y: 1 }}
-      >
+      <View style={styles.content}>
         <Text style={styles.text}>Login</Text>
         <TextInput
           placeholder="Email"
@@ -99,7 +94,7 @@ export default function LoginScreen() {
             style={{
               width: 150,
               height: 40,
-              borderColor: "white",
+              borderColor: "#FFC700",
               borderWidth: 2,
               borderRadius: 26,
               justifyContent: "center",
@@ -109,10 +104,10 @@ export default function LoginScreen() {
               navigation.navigate("RegisterScreen");
             }}
           >
-            <Text style={{ color: "white" }}>Register here</Text>
+            <Text style={{ color: "#FFC700" }}>Register here</Text>
           </Pressable>
         </View>
-      </LinearGradient>
+      </View>
     </SafeAreaView>
   );
 }
@@ -120,7 +115,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "red",
+    backgroundColor: "#008073",
   },
   content: {
     flex: 1,
@@ -129,14 +124,14 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   text: {
-    color: "white",
+    color: "#FFC700",
     fontSize: 60,
     fontWeight: "bold",
   },
   button: {
     width: 150,
     height: 40,
-    backgroundColor: "white",
+    backgroundColor: "#FFC700",
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",

@@ -53,12 +53,7 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={["#ffc800", "#4bcc99", "#008073"]}
-        style={styles.content}
-        start={{ x: 2, y: 0 }}
-        end={{ x: 2, y: 1 }}
-      >
+      <View style={styles.content}>
         <Text style={styles.text}>Register</Text>
         <TextInput
           placeholder="Email"
@@ -121,7 +116,7 @@ export default function RegisterScreen() {
             }
           }}
         >
-          <Text style={{ color: "#008073" }}>Register</Text>
+          <Text style={{ color: "#FFC700" }}>Register</Text>
         </TouchableOpacity>
         <View
           style={{
@@ -139,7 +134,7 @@ export default function RegisterScreen() {
             style={{
               width: 150,
               height: 40,
-              borderColor: "white",
+              borderColor: "#008073",
               borderWidth: 2,
               borderRadius: 26,
               justifyContent: "center",
@@ -149,10 +144,10 @@ export default function RegisterScreen() {
               navigation.navigate("LoginScreen");
             }}
           >
-            <Text style={{ color: "white" }}>Login here</Text>
+            <Text style={{ color: "#008073" }}>Login here</Text>
           </Pressable>
         </View>
-      </LinearGradient>
+      </View>
     </SafeAreaView>
   );
 }
@@ -160,7 +155,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "red",
+    backgroundColor: "#FFC700",
   },
   content: {
     flex: 1,
@@ -169,14 +164,14 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   text: {
-    color: "white",
+    color: "#008073",
     fontSize: 60,
     fontWeight: "bold",
   },
   button: {
     width: 150,
     height: 40,
-    backgroundColor: "white",
+    backgroundColor: "#008073",
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",
