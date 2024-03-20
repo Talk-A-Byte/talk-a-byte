@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet, Pressable, TextInput, Text } from "react-native";
+import { View, StyleSheet, Pressable, TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import Voice from "@react-native-voice/voice";
 import * as Speech from "expo-speech";
@@ -16,6 +16,8 @@ export default function RecorderScreen() {
   const [extractedText, setExtractedText] = useState("");
   const [onSpeak, setOnSpeak] = useState(false);
   const [font, setFont] = useState("lucida grande");
+  const [copyText, setCopyText] = useState("");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     Voice.onSpeechError = onSpeechError;
@@ -25,6 +27,26 @@ export default function RecorderScreen() {
       Voice.destroy().then(Voice.removeAllListeners);
     };
   }, []);
+
+  const handleCopyText = (text) => {
+    setCopyText(text);
+    setCopied(false);
+  };
+
+  const copyToClipboard = () => {
+    if (copyText) {
+      Clipboard.setString(copyText);
+
+      // Display a success message
+      if (Platform.OS === "android") {
+        ToastAndroid.show("Text copied to clipboard!", ToastAndroid.SHORT);
+      } else if (Platform.OS === "ios") {
+        AlertIOS.alert("Text copied to clipboard!");
+      }
+
+      setCopied(true);
+    }
+  };
 
   const handleInputChange = (input) => {
     setExtractedText(input);
