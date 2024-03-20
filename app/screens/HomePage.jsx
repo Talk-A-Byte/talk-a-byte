@@ -46,7 +46,7 @@ export default function HomeScreen() {
   const pickImageGallery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: false,
       base64: true,
       allowsMultipleSelection: false,
     });
@@ -61,7 +61,7 @@ export default function HomeScreen() {
     try {
       let result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: false,
         base64: true,
         allowsMultipleSelection: false,
       });
@@ -262,16 +262,21 @@ export default function HomeScreen() {
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Pressable
           onPress={() =>
-            Alert.alert("Hi!", "Which one would u prefer?", [
-              {
-                text: "Pick image from gallery",
-                onPress: pickImageGallery,
-              },
-              {
-                text: "Pick image from Camera",
-                onPress: pickImageCamera,
-              },
-            ])
+            Alert.alert(
+              "Which one would u prefer?",
+              "",
+              [
+                {
+                  text: "Pick image from gallery",
+                  onPress: pickImageGallery,
+                },
+                {
+                  text: "Pick image from Camera",
+                  onPress: pickImageCamera,
+                },
+              ],
+              { cancelable: true }
+            )
           }
         >
           <View style={styles.cardButton}>
