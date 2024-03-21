@@ -205,7 +205,7 @@ export default function HomeScreen() {
       </View>
       {isLoggedIn && (
         <>
-          {data?.getScans.length === 0 && (
+          {(data?.getScans.length === 0 || data === undefined) && (
             <View
               style={{
                 backgroundColor: "white",
