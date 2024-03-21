@@ -41,7 +41,7 @@ export default function ResultScreen({ route, navigation }) {
         flex: 1,
         padding: 25,
         backgroundColor: "#008073",
-        gap: 20,
+        gap: 10,
       }}
     >
       <View
@@ -189,18 +189,36 @@ export default function ResultScreen({ route, navigation }) {
           ""
         )}
       </ScrollView>
-      <Button
-        title="Text To Speech"
+      <Pressable
+        style={{
+          backgroundColor: "#FFC700",
+          padding: 10,
+          alignItems: "center",
+          borderRadius: 25,
+        }}
         onPress={() => {
           Speech.speak(extractedText);
         }}
-      />
-      <Button
-        title="Stop Speech to Text"
+      >
+        <Text style={{ color: "white", fontWeight: "bold" }}>
+          TEXT TO SPEECH
+        </Text>
+      </Pressable>
+      <Pressable
+        style={{
+          backgroundColor: "#FFC700",
+          padding: 10,
+          alignItems: "center",
+          borderRadius: 25,
+        }}
         onPress={() => {
           Speech.stop();
         }}
-      />
+      >
+        <Text style={{ color: "white", fontWeight: "bold" }}>
+          STOP TEXT TO SPEECH
+        </Text>
+      </Pressable>
     </View>
   );
 }

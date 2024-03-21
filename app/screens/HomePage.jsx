@@ -276,7 +276,7 @@ export default function HomeScreen() {
         <Pressable
           onPress={() =>
             Alert.alert(
-              "Which one would u prefer?",
+              "Which one would you prefer?",
               "",
               [
                 {
