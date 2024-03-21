@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -13,6 +13,7 @@ import * as Speech from "expo-speech";
 import { useMutation } from "@apollo/client";
 import { ADD_SCAN, GET_SCANS } from "../queries";
 import { useFonts } from "expo-font";
+import { LoginContext } from "../contexts/LoginContext";
 
 export default function ResultScreen({ route, navigation }) {
   const [fontsLoaded] = useFonts({
@@ -25,6 +26,8 @@ export default function ResultScreen({ route, navigation }) {
   const [addScan, { error, loading, data }] = useMutation(ADD_SCAN, {
     refetchQueries: [GET_SCANS],
   });
+
+  const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
 
   useEffect(() => {
     if (image) {
@@ -95,29 +98,47 @@ export default function ResultScreen({ route, navigation }) {
               Aa
             </Text>
           </Pressable>
-          <Pressable
-            style={{
-              alignItems: "flex-end",
-              marginHorizontal: 20,
-              marginVertical: 20,
-            }}
-            onPress={async () => {
-              try {
-                await addScan({
-                  variables: {
-                    file: image,
-                  },
-                });
+          {isLoggedIn && (
+            <Pressable
+              style={{
+                alignItems: "flex-end",
+                marginHorizontal: 20,
+                marginVertical: 20,
+              }}
+              onPress={async () => {
+                try {
+                  await addScan({
+                    variables: {
+                      file: image,
+                    },
+                  });
+                  Speech.stop();
+
+                  navigation.navigate("HomeScreen");
+                } catch (error) {
+                  console.log(error);
+                }
+              }}
+            >
+              <Ionicons name="save" size={45} color={"#008073"} />
+            </Pressable>
+          )}
+          {!isLoggedIn && (
+            <Pressable
+              style={{
+                alignItems: "flex-end",
+                marginHorizontal: 20,
+                marginVertical: 20,
+              }}
+              onPress={() => {
                 Speech.stop();
 
-                navigation.navigate("HomeScreen");
-              } catch (error) {
-                console.log(error);
-              }
-            }}
-          >
-            <Ionicons name="save" size={45} color={"#008073"} />
-          </Pressable>
+                navigation.navigate("LoginScreen");
+              }}
+            >
+              <Ionicons name="save" size={45} color={"#008073"} />
+            </Pressable>
+          )}
         </View>
         <Text
           style={{
