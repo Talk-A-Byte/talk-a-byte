@@ -253,7 +253,22 @@ export default function HomeScreen() {
               navigation.navigate("LoginScreen");
             }}
           >
-            <Ionicons name="enter-outline" size={100} color={"#008073"} />
+            <Ionicons
+              name="enter-outline"
+              size={100}
+              color={"#008073"}
+              style={{ alignSelf: "center" }}
+            />
+            <Text
+              style={{
+                alignSelf: "center",
+                color: "#008073",
+                fontWeight: "bold",
+                fontSize: 25,
+              }}
+            >
+              Login to save your scans!
+            </Text>
           </Pressable>
         </View>
       )}

@@ -12,8 +12,13 @@ import {
 import * as Speech from "expo-speech";
 import { useMutation } from "@apollo/client";
 import { ADD_SCAN, GET_SCANS } from "../queries";
+import { useFonts } from "expo-font";
 
 export default function ResultScreen({ route, navigation }) {
+  const [fontsLoaded] = useFonts({
+    "OpenDyslexic3-Regular": require("../fonts/OpenDyslexic3-Regular.ttf"),
+  });
+  const [font, setFont] = useState("lucida grande");
   const { image, extractedText, labels, file } = route.params;
   const [imageLoaded, setImageLoaded] = useState("");
 
@@ -69,39 +74,76 @@ export default function ResultScreen({ route, navigation }) {
           width: "100%",
           backgroundColor: "white",
           borderRadius: 24,
-          padding: 20,
+          padding: 10,
         }}
       >
-        <Pressable
+        <View
           style={{
-            alignItems: "flex-end",
-            marginHorizontal: 20,
-            marginVertical: 20,
-          }}
-          onPress={async () => {
-            try {
-              await addScan({
-                variables: {
-                  file: image,
-                },
-              });
-              Speech.stop();
-
-              navigation.navigate("HomeScreen");
-            } catch (error) {
-              console.log(error);
-            }
+            flexDirection: "row",
+            alignSelf: "flex-end",
+            gap: 10,
+            justifyContent: "center",
           }}
         >
-          <Ionicons name="save" size={45} color={"#008073"} />
-        </Pressable>
-        <Text style={{ color: "#FFC700", fontSize: 30, fontWeight: "bold" }}>
+          <Pressable
+            onPress={() => {
+              if (font === "lucida grande") setFont("OpenDyslexic3-Regular");
+              if (font === "OpenDyslexic3-Regular") setFont("lucida grande");
+            }}
+          >
+            <Text style={{ fontSize: 40, color: "#008073", fontFamily: font }}>
+              Aa
+            </Text>
+          </Pressable>
+          <Pressable
+            style={{
+              alignItems: "flex-end",
+              marginHorizontal: 20,
+              marginVertical: 20,
+            }}
+            onPress={async () => {
+              try {
+                await addScan({
+                  variables: {
+                    file: image,
+                  },
+                });
+                Speech.stop();
+
+                navigation.navigate("HomeScreen");
+              } catch (error) {
+                console.log(error);
+              }
+            }}
+          >
+            <Ionicons name="save" size={45} color={"#008073"} />
+          </Pressable>
+        </View>
+        <Text
+          style={{
+            color: "#FFC700",
+            fontSize: 30,
+            fontFamily: font,
+          }}
+        >
           Extracted Text:
         </Text>
-        <Text style={{ color: "black", fontSize: 30, fontWeight: "bold" }}>
+        <Text
+          style={{
+            color: "black",
+            fontSize: 30,
+            fontFamily: font,
+          }}
+        >
           {extractedText}
         </Text>
-        <Text style={{ color: "#008073", fontSize: 30, fontWeight: "bold" }}>
+        <Text
+          style={{
+            color: "#008073",
+            fontSize: 30,
+            fontFamily: font,
+          }}
+        >
           Object Recognized:
         </Text>
 
@@ -110,7 +152,11 @@ export default function ResultScreen({ route, navigation }) {
             {labels.map((label, idx) => {
               return (
                 <Text
-                  style={{ color: "black", fontSize: 30, fontWeight: "bold" }}
+                  style={{
+                    color: "black",
+                    fontSize: 30,
+                    fontFamily: font,
+                  }}
                   key={`${idx}-${label.scores}`}
                 >
                   -{label.description}

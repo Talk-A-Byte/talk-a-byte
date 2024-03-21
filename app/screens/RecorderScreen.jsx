@@ -20,12 +20,12 @@ export default function RecorderScreen() {
   const [fontsLoaded] = useFonts({
     "OpenDyslexic3-Regular": require("../fonts/OpenDyslexic3-Regular.ttf"),
   });
+  const [font, setFont] = useState("lucida grande");
   const navigation = useNavigation();
 
   const [started, setStarted] = useState(false);
   const [extractedText, setExtractedText] = useState("");
   const [onSpeak, setOnSpeak] = useState(false);
-  const [font, setFont] = useState("lucida grande");
   const [copyText, setCopyText] = useState("");
   const [copied, setCopied] = useState(false);
 
